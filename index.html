@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calidad Premium Oeste - Calidad Premium</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Poppins & Lexend -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;900&family=Lexend:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        /* Estilos personalizados y modernos */
+        body {
+            font-family: 'Lexend', sans-serif;
+            background-color: #050505;
+            color: #e0e0e0;
+        }
+
+        /* Clase para evitar el scroll cuando el modal o carrito está abierto */
+        body.overflow-hidden {
+            overflow: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Video de fondo y superposición */
+        .video-bg-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        .video-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: translate(-50%, -50%);
+        }
+        .overlay {
+            background: radial-gradient(ellipse at center, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.8) 100%);
+        }
+
+        /* Header con efecto Glassmorphism */
+        #main-header {
+            transition: all 0.3s ease-in-out;
+        }
+        #main-header.scrolled {
+            background-color: rgba(10, 10, 10, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px); /* Para Safari */
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Animaciones de aparición */
+        .reveal-section {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.645, 0.045, 0.355, 1), transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+            transition-delay: 0.2s;
+        }
+        .reveal-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Estilo para tarjetas de categoría activa */
+        .category-tab.active-category {
+            color: #4ade80;
+            border-color: #4ade80;
+        }
+        
+        /* Estilo moderno para tarjetas de producto */
+        .product-card {
+            background: #111111;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(107, 235, 129, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Estilo para sidebar del carrito */
+        #cart-sidebar {
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        #cart-sidebar.active {
+            transform: translateX(0);
+        }
+        
+        /* Gradiente de acento */
+        .accent-gradient {
+            background: linear-gradient(90deg, #4ade80, #34d399);
+        }
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-[#050505] text-gray-200">
+
+    <!-- Modal de Verificación de Edad -->
+    <div id="age-gate-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity duration-300 bg-black bg-opacity-70 backdrop-blur-sm opacity-0">
+        <div id="age-gate-content" class="w-full max-w-md p-8 text-center transform transition-all duration-300 scale-95 opacity-0 rounded-2xl shadow-2xl" style="background: rgba(15, 15, 15, 0.8); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1);">
+            <img src="https://hashkiekush.com.ar/wp-content/uploads/2023/11/White-Vector-Logo-1-1024x1024.png" alt="Logo" class="h-24 w-24 mx-auto mb-6" onerror="this.onerror=null;this.src='https://placehold.co/96x96/000000/FFFFFF?text=Logo';">
+            <h2 class="text-3xl font-bold mb-2">¿SOS MAYOR DE EDAD?</h2>
+            <p class="text-gray-400 mb-8 font-light">Debes tener 18 años o más para ingresar a este sitio.</p>
+            <div class="flex justify-center gap-4">
+                <button id="age-gate-yes" class="flex-1 bg-green-500 text-black font-bold py-3 px-8 rounded-full uppercase tracking-widest text-sm transition-all duration-300 ease-in-out hover:bg-green-400 hover:shadow-lg hover:shadow-green-500/30 hover:scale-105">
+                    Sí, soy mayor
+                </button>
+                <button id="age-gate-no" class="flex-1 bg-gray-700 text-white font-bold py-3 px-8 rounded-full uppercase tracking-widest text-sm transition-all duration-300 ease-in-out hover:bg-red-600 hover:scale-105">
+                    No, soy menor
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sidebar del Carrito -->
+    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-full max-w-md bg-gray-900/80 backdrop-blur-lg shadow-2xl z-[60] transform translate-x-full flex flex-col">
+        <div class="flex justify-between items-center p-6 border-b border-gray-700">
+            <h2 class="text-2xl font-bold">CARRITO</h2>
+            <button id="close-cart-btn" class="text-2xl text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="cart-items-container" class="flex-grow p-6 overflow-y-auto">
+            <!-- Los items del carrito se insertarán aquí -->
+             <p class="text-center text-gray-400">Tu carrito está vacío.</p>
+        </div>
+        <div class="p-6 border-t border-gray-700">
+            <div class="flex justify-between items-center text-xl mb-4">
+                <span class="font-light">Total:</span>
+                <span id="cart-total" class="font-bold">$0</span>
+            </div>
+            <button class="w-full bg-green-500 text-black font-bold py-3 px-8 rounded-full uppercase tracking-widest text-sm transition-all duration-300 ease-in-out hover:bg-green-400 hover:shadow-lg hover:shadow-green-500/30 hover:scale-105">
+                Finalizar Compra
+            </button>
+        </div>
+    </div>
+
+
+    <!-- Contenedor Principal -->
+    <div class="w-full">
+
+        <!-- Encabezado Fijo -->
+        <header id="main-header" class="fixed top-0 left-0 right-0 z-50 p-4 flex justify-between items-center container mx-auto">
+             <a href="/" class="block">
+                <img src="https://hashkiekush.com.ar/wp-content/uploads/2023/11/White-Vector-Logo-1-1024x1024.png" 
+                     alt="Logo de Calidad Premium Oeste" 
+                     class="h-20 w-20 sm:h-24 sm:w-24 transition-all duration-300"
+                     onerror="this.onerror=null;this.src='https://placehold.co/96x96/000000/FFFFFF?text=Logo';">
+            </a>
+            <button id="open-cart-btn" class="relative text-2xl text-gray-200 hover:text-green-400 transition-colors">
+                <i class="fas fa-shopping-cart"></i>
+                <span id="cart-item-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+            </button>
+        </header>
+
+        <!-- Sección de Héroe -->
+        <section class="relative h-screen flex items-center justify-center text-center">
+            <div class="video-bg-container">
+                <video autoplay muted loop playsinline class="video-bg">
+                    <source src="https://hashkiekush.com.ar/wp-content/uploads/2023/11/Weed-Background-Video-For-Website-Cannabis-Background-Video-Free-No-Copyright%E2%80%A6.mp4" type="video/mp4">
+                    Tu navegador no soporta el video.
+                </video>
+                <div class="absolute inset-0 overlay"></div>
+            </div>
+            <div class="relative z-10 px-4">
+                <h1 class="text-5xl sm:text-7xl md:text-8xl font-black uppercase tracking-tighter text-shadow-lg">
+                    Calidad <span class="accent-gradient text-gradient">Premium</span>
+                </h1>
+                <p class="mt-4 text-lg sm:text-xl max-w-2xl mx-auto text-gray-300 font-light">
+                    Genéticas exclusivas y flores de la más alta calidad.
+                </p>
+                <a href="#productos" class="mt-8 inline-block bg-green-500 text-black font-bold py-3 px-8 rounded-full uppercase tracking-widest text-sm
+                                        transition-all duration-300 ease-in-out
+                                        hover:bg-green-400 hover:shadow-lg hover:shadow-green-500/30 hover:scale-105">
+                    Ver Productos
+                </a>
+            </div>
+        </section>
+
+        <main class="bg-[#050505] relative z-10">
+            <!-- Sección de Productos -->
+            <section id="productos" class="py-20 sm:py-32 reveal-section">
+                <div class="container mx-auto px-6">
+                     <h2 class="text-4xl sm:text-5xl font-bold mb-8 text-center">NUESTROS PRODUCTOS</h2>
+                     <!-- Pestañas de Categorías -->
+                     <div id="category-tabs" class="flex justify-center gap-4 sm:gap-8 mb-12 border-b border-gray-800">
+                         <button data-category="flores" class="category-tab active-category text-lg font-semibold py-4 px-2 border-b-2 border-transparent hover:text-green-400 transition-colors">FLORES</button>
+                         <button data-category="extracciones" class="category-tab text-lg font-semibold py-4 px-2 border-b-2 border-transparent hover:text-green-400 transition-colors">EXTRACCIONES</button>
+                         <button data-category="comestibles" class="category-tab text-lg font-semibold py-4 px-2 border-b-2 border-transparent hover:text-green-400 transition-colors">COMESTIBLES</button>
+                     </div>
+
+                     <!-- Contenedor para los Productos de las Categorías -->
+                     <div id="product-sections-container">
+                        <!-- Sección Flores -->
+                        <div id="productos-flores" class="product-grid"></div>
+                        <!-- Sección Extracciones -->
+                        <div id="productos-extracciones" class="product-grid hidden"></div>
+                        <!-- Sección Comestibles -->
+                        <div id="productos-comestibles" class="product-grid hidden"></div>
+                     </div>
+                </div>
+            </section>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="bg-black py-12">
+            <div class="container mx-auto px-6 text-center text-gray-500">
+                 <div class="flex justify-center gap-6 mb-6 text-2xl">
+                     <a href="#" class="hover:text-green-400 transition-colors"><i class="fab fa-instagram"></i></a>
+                     <a href="#" class="hover:text-green-400 transition-colors"><i class="fab fa-whatsapp"></i></a>
+                     <a href="#" class="hover:text-green-400 transition-colors"><i class="fab fa-telegram"></i></a>
+                 </div>
+                 <p>&copy; 2025 Calidad Premium Oeste. Todos los derechos reservados.</p>
+                 <p class="text-xs mt-2 opacity-70">Este es un clon con fines demostrativos.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const body = document.body;
+
+            // --- Lógica del Modal de Verificación de Edad ---
+            const ageGateModal = document.getElementById('age-gate-modal');
+            const ageGateContent = document.getElementById('age-gate-content');
+            const yesButton = document.getElementById('age-gate-yes');
+            const noButton = document.getElementById('age-gate-no');
+            
+            setTimeout(() => {
+                body.classList.add('overflow-hidden');
+                ageGateModal.classList.remove('opacity-0');
+                ageGateContent.classList.remove('scale-95', 'opacity-0');
+            }, 100);
+
+            yesButton.addEventListener('click', () => {
+                ageGateModal.classList.add('opacity-0');
+                ageGateContent.classList.add('scale-95', 'opacity-0');
+                body.classList.remove('overflow-hidden');
+                setTimeout(() => ageGateModal.style.display = 'none', 300);
+            });
+
+            noButton.addEventListener('click', () => {
+                window.location.href = 'https://www.google.com';
+            });
+
+            // --- Lógica del Carrito y Productos ---
+            const products = {
+                flores: [
+                    { id: 1, name: 'Amnesia Haze', price: 1500, img: 'https://hashkiekush.com.ar/wp-content/uploads/2023/11/pexels-kindel-media-7965947-1-scaled.jpg', desc: 'Sativa dominante con efectos cerebrales y energéticos.' },
+                    { id: 2, name: 'OG Kush', price: 1650, img: 'https://images.pexels.com/photos/7693963/pexels-photo-7693963.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', desc: 'Híbrida famosa por su aroma terroso y pino.' },
+                    { id: 3, name: 'Gorilla Glue', price: 1700, img: 'https://images.pexels.com/photos/7700263/pexels-photo-7700263.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', desc: 'Potente y pegajosa, ideal para relajación profunda.' }
+                ],
+                extracciones: [
+                    { id: 4, name: 'Rosin Prensado', price: 3500, img: 'https://hashkiekush.com.ar/wp-content/uploads/2023/11/Extracciones-scaled.jpg', desc: 'Extracción sin solventes, pura y potente.' },
+                    { id: 5, name: 'Live Resin', price: 4200, img: 'https://images.pexels.com/photos/8148626/pexels-photo-8148626.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', desc: 'Perfil de terpenos excepcional y sabor intenso.' },
+                    { id: 6, name: 'Shatter', price: 3800, img: 'https://images.pexels.com/photos/8430268/pexels-photo-8430268.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', desc: 'Alta concentración de THC, consistencia cristalina.' }
+                ],
+                comestibles: [
+                    { id: 7, name: 'Gomitas de Fruta', price: 2500, img: 'https://images.pexels.com/photos/7700201/pexels-photo-7700201.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', desc: 'Dosis precisas y deliciosas para una experiencia controlada.' },
+                    { id: 8, name: 'Brownie Especial', price: 2800, img: 'https://hashkiekush.com.ar/wp-content/uploads/2023/11/Comestibles-1-scaled.jpg', desc: 'Clásico y potente, perfecto para una noche tranquila.' },
+                    { id: 9, name: 'Aceite de Coco', price: 5000, img: 'https://images.pexels.com/photos/8148632/pexels-photo-8148632.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', desc: 'Versátil y fácil de dosificar, ideal para cocinar.' }
+                ]
+            };
+            
+            let cart = [];
+
+            const cartSidebar = document.getElementById('cart-sidebar');
+            const openCartBtn = document.getElementById('open-cart-btn');
+            const closeCartBtn = document.getElementById('close-cart-btn');
+            const cartItemCount = document.getElementById('cart-item-count');
+            const cartItemsContainer = document.getElementById('cart-items-container');
+            const cartTotalEl = document.getElementById('cart-total');
+
+            // Renderizar productos
+            function renderProducts() {
+                for (const category in products) {
+                    const container = document.getElementById(`productos-${category}`);
+                    container.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>`;
+                    const grid = container.querySelector('.grid');
+                    products[category].forEach(product => {
+                        grid.innerHTML += `
+                            <div class="product-card flex flex-col">
+                                <img src="${product.img}" alt="${product.name}" class="w-full h-64 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/111111/FFFFFF?text=${product.name}';">
+                                <div class="p-6 flex flex-col flex-grow">
+                                    <h3 class="text-2xl font-bold mb-2">${product.name}</h3>
+                                    <p class="text-gray-400 font-light mb-4 flex-grow">${product.desc}</p>
+                                    <p class="text-2xl font-bold text-green-400 mb-6">$${product.price}</p>
+                                    <div class="flex gap-4 mt-auto">
+                                        <button class="add-to-cart-btn flex-1 bg-green-500 text-black font-bold py-2 px-4 rounded-lg uppercase tracking-wider text-xs transition-transform hover:scale-105" data-id="${product.id}" data-category="${category}">Añadir al carrito</button>
+                                        <button class="flex-1 bg-gray-700 text-white font-bold py-2 px-4 rounded-lg uppercase tracking-wider text-xs transition-transform hover:scale-105">Detalle</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            }
+
+            // Actualizar vista del carrito
+            function updateCartView() {
+                if (cart.length === 0) {
+                    cartItemsContainer.innerHTML = '<p class="text-center text-gray-400">Tu carrito está vacío.</p>';
+                    cartItemCount.classList.add('hidden');
+                } else {
+                    cartItemsContainer.innerHTML = '';
+                    cart.forEach(item => {
+                        cartItemsContainer.innerHTML += `
+                            <div class="flex items-center gap-4 mb-4">
+                                <img src="${item.img}" alt="${item.name}" class="w-20 h-20 object-cover rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/80x80/333333/FFFFFF?text=${item.name}';">
+                                <div class="flex-grow">
+                                    <h4 class="font-bold">${item.name}</h4>
+                                    <p class="text-sm text-gray-400">$${item.price} x ${item.quantity}</p>
+                                </div>
+                                <p class="font-bold text-lg">$${item.price * item.quantity}</p>
+                            </div>
+                        `;
+                    });
+                }
+
+                const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+                cartTotalEl.innerText = `$${total}`;
+
+                const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+                if (count > 0) {
+                    cartItemCount.innerText = count;
+                    cartItemCount.classList.remove('hidden');
+                } else {
+                    cartItemCount.classList.add('hidden');
+                }
+            }
+
+            // Añadir al carrito
+            function addToCart(productId, category) {
+                const product = products[category].find(p => p.id == productId);
+                const cartItem = cart.find(item => item.id == productId);
+
+                if (cartItem) {
+                    cartItem.quantity++;
+                } else {
+                    cart.push({ ...product, quantity: 1 });
+                }
+                updateCartView();
+            }
+
+            // Listeners para Pestañas de Categoría
+            const categoryTabs = document.querySelectorAll('.category-tab');
+            categoryTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const category = tab.dataset.category;
+                    
+                    categoryTabs.forEach(t => t.classList.remove('active-category'));
+                    tab.classList.add('active-category');
+
+                    document.querySelectorAll('.product-grid').forEach(grid => grid.classList.add('hidden'));
+                    document.getElementById(`productos-${category}`).classList.remove('hidden');
+                });
+            });
+            
+            // Listeners para Botones de "Añadir al Carrito" (usando delegación de eventos)
+            document.getElementById('product-sections-container').addEventListener('click', (e) => {
+                if (e.target.classList.contains('add-to-cart-btn')) {
+                    const productId = e.target.dataset.id;
+                    const category = e.target.dataset.category;
+                    addToCart(productId, category);
+                }
+            });
+
+            // Listeners para abrir/cerrar carrito
+            openCartBtn.addEventListener('click', () => {
+                cartSidebar.classList.add('active');
+                body.classList.add('overflow-hidden');
+            });
+            closeCartBtn.addEventListener('click', () => {
+                cartSidebar.classList.remove('active');
+                if(!ageGateModal || ageGateModal.style.display === 'none') {
+                   body.classList.remove('overflow-hidden');
+                }
+            });
+            
+            // Inicialización
+            renderProducts();
+            updateCartView();
+        });
+    </script>
+</body>
+</html>
